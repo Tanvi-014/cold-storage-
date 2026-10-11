@@ -1,5 +1,8 @@
 // Base URL of our Flask backend API
-const API_URL = "http://127.0.0.1:5000/api/items";
+// Automatically adapts whether opened as a local file or served from a web host
+const API_URL = (window.location.protocol === "http:" || window.location.protocol === "https:")
+  ? `${window.location.origin}/api/items`
+  : "http://127.0.0.1:5000/api/items";
 
 
 // 1. READ: Load all cold storage items from database
