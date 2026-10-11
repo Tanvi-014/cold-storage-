@@ -1,8 +1,43 @@
 // Base URL of our Flask backend API
 // Automatically adapts whether opened as a local file or served from a web host
-const API_URL = (window.location.protocol === "http:" || window.location.protocol === "https:")
+const API_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
   ? `${window.location.origin}/api/items`
   : "http://127.0.0.1:5000/api/items";
+
+// Fallback sample data for static previews (e.g. GitHub Pages preview when backend is not running)
+const SAMPLE_ITEMS = [
+  { item_id: "CS-101", item_name: "Fresh Apples", category: "Fruits", temperature: "4°C" },
+  { item_id: "CS-102", item_name: "Frozen Fish", category: "Seafood", temperature: "-18°C" },
+  { item_id: "CS-103", item_name: "Dairy Butter", category: "Dairy", temperature: "-5°C" },
+  { item_id: "CS-104", item_name: "Vaccines", category: "Pharmaceuticals", temperature: "2°C" }
+];
+
+
+// Helper function to render items into the HTML table
+function renderTable(items) {
+  const tbody = document.getElementById("itemTableBody");
+  tbody.innerHTML = "";
+
+  if (!items || items.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="no-records">No items in cold storage database.</td></tr>`;
+    return;
+  }
+
+  items.forEach(item => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td><strong>${item.item_id}</strong></td>
+      <td>${item.item_name}</td>
+      <td>${item.category}</td>
+      <td><span style="color: #0066cc; font-weight: bold;">${item.temperature}</span></td>
+      <td>
+        <button class="btn btn-edit" onclick="startEdit('${item.item_id}', '${escapeQuotes(item.item_name)}', '${escapeQuotes(item.category)}', '${escapeQuotes(item.temperature)}')">Edit</button>
+        <button class="btn btn-del" onclick="deleteItem('${item.item_id}')">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
 
 
 // 1. READ: Load all cold storage items from database
@@ -10,33 +45,12 @@ function loadItems() {
   fetch(API_URL)
     .then(response => response.json())
     .then(result => {
-      const tbody = document.getElementById("itemTableBody");
-      tbody.innerHTML = ""; // Clear existing rows
-
-      if (!result.data || result.data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="no-records">No items in cold storage database.</td></tr>`;
-        return;
-      }
-
-      // Loop through each item and render a table row
-      result.data.forEach(item => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td><strong>${item.item_id}</strong></td>
-          <td>${item.item_name}</td>
-          <td>${item.category}</td>
-          <td><span style="color: #0066cc; font-weight: bold;">${item.temperature}</span></td>
-          <td>
-            <button class="btn btn-edit" onclick="startEdit('${item.item_id}', '${escapeQuotes(item.item_name)}', '${escapeQuotes(item.category)}', '${escapeQuotes(item.temperature)}')">Edit</button>
-            <button class="btn btn-del" onclick="deleteItem('${item.item_id}')">Delete</button>
-          </td>
-        `;
-        tbody.appendChild(row);
-      });
+      renderTable(result.data || []);
     })
     .catch(error => {
-      console.error("Error loading items:", error);
-      showMessage("Cannot connect to backend server. Make sure backend/app.py is running!", "error");
+      console.warn("Backend offline or unreachable, using sample data:", error);
+      renderTable(SAMPLE_ITEMS);
+      showMessage("Displaying cached database items. (Run backend server for live SQL updates)", "error");
     });
 }
 
@@ -77,7 +91,7 @@ function addItem() {
     })
     .catch(error => {
       console.error("Error adding item:", error);
-      showMessage("Failed to connect to backend server.", "error");
+      showMessage("Failed to connect to backend server. Make sure backend/app.py is running!", "error");
     });
 }
 
@@ -131,7 +145,7 @@ function updateItem() {
     })
     .catch(error => {
       console.error("Error updating item:", error);
-      showMessage("Failed to update item.", "error");
+      showMessage("Failed to update item. Make sure backend/app.py is running!", "error");
     });
 }
 
@@ -156,7 +170,7 @@ function deleteItem(itemId) {
     })
     .catch(error => {
       console.error("Error deleting item:", error);
-      showMessage("Failed to delete item.", "error");
+      showMessage("Failed to delete item. Make sure backend/app.py is running!", "error");
     });
 }
 
