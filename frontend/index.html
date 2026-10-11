@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cold Storage Management System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header Section -->
+    <header>
+      <h1>Cold Storage Management System</h1>
+      <p class="subtitle">DBMS Lab - Cold Storage Inventory & Temperature Tracking</p>
+    </header>
+
+    <!-- Notification Message Banner -->
+    <div id="statusMessage" class="message-banner" style="display: none;"></div>
+
+    <!-- Cold Storage Form Section -->
+    <section class="form-section">
+      <h2 id="formTitle">Add New Item to Storage</h2>
+      <form id="itemForm" onsubmit="event.preventDefault();">
+        <div class="form-group">
+          <label for="itemId">Item / Batch ID (Primary Key):</label>
+          <input type="text" id="itemId" placeholder="e.g. CS-101" required>
+        </div>
+
+        <div class="form-group">
+          <label for="itemName">Item Name:</label>
+          <input type="text" id="itemName" placeholder="e.g. Fresh Apples" required>
+        </div>
+
+        <div class="form-group">
+          <label for="category">Category:</label>
+          <input type="text" id="category" placeholder="e.g. Fruits, Seafood, Dairy, Medicine" required>
+        </div>
+
+        <div class="form-group">
+          <label for="temperature">Required Temperature:</label>
+          <input type="text" id="temperature" placeholder="e.g. 4°C or -18°C" required>
+        </div>
+
+        <div class="button-group">
+          <button type="button" id="btnAdd" class="btn btn-primary" onclick="addItem()">Add Item</button>
+          <button type="button" id="btnUpdate" class="btn btn-warning" onclick="updateItem()" style="display: none;">Update Item</button>
+          <button type="button" id="btnClear" class="btn btn-secondary" onclick="resetForm()">Clear</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Inventory Records Table Section -->
+    <section class="table-section">
+      <div class="table-header">
+        <h2>Cold Storage Inventory</h2>
+        <button type="button" class="btn btn-outline" onclick="loadItems()">Refresh Table</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Item ID</th>
+            <th>Item Name</th>
+            <th>Category</th>
+            <th>Temperature</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="itemTableBody">
+          <!-- Rows will be dynamically loaded here by script.js -->
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
